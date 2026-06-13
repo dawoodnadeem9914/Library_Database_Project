@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:attr="data-bs-theme=${appSettings.themeMode == 'auto' ? 'light' : appSettings.themeMode}">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<aside th:replace="~{fragments/layout :: sidebar('books')}"></aside>
+
+<main class="main fade-in">
+    <h1 class="h3 page-title mb-1" th:text="${pageTitle}">Book Form</h1>
+    <p class="text-secondary small mb-4">Fields marked * are required</p>
+
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <div class="card glass p-4" style="max-width: 860px">
+        <form th:action="@{${formAction}}" th:object="${book}" method="post"
+              enctype="multipart/form-data" novalidate>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label" for="title">Title *</label>
+                    <input id="title" type="text" class="form-control" th:field="*{title}"
+                           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:errors="*{title}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="author">Author *</label>
+                    <input id="author" type="text" class="form-control" th:field="*{author}"
+                           th:classappend="${#fields.hasErrors('author')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:errors="*{author}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="isbn">ISBN * <span class="text-secondary small">(must be unique)</span></label>
+                    <input id="isbn" type="text" class="form-control" th:field="*{isbn}" placeholder="10 or 13 digits"
+                           th:classappend="${#fields.hasErrors('isbn')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:errors="*{isbn}"></div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="category">Category *</label>
+                    <select id="category" class="form-select" th:field="*{category}"
+                            th:classappend="${#fields.hasErrors('category')} ? 'is-invalid'">
+                        <option value="">-- select --</option>
+                        <option value="Databases">Databases</option>
+                        <option value="Programming">Programming</option>
+                        <option value="Software Engineering">Software Engineering</option>
+                        <option value="Networking">Networking</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="General">General</option>
+                    </select>
+                    <div class="invalid-feedback" th:errors="*{category}"></div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="publisher">Publisher</label>
+                    <input id="publisher" type="text" class="form-control" th:field="*{publisher}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="publicationYear">Publication Year</label>
+                    <input id="publicationYear" type="number" min="1900" max="2100" class="form-control"
+                           th:field="*{publicationYear}"
+                           th:classappend="${#fields.hasErrors('publicationYear')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:errors="*{publicationYear}"></div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="language">Language</label>
+                    <input id="language" type="text" class="form-control" th:field="*{language}"
+                           placeholder="e.g. English / Bahasa Melayu">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="edition">Edition</label>
+                    <input id="edition" type="text" class="form-control" th:field="*{edition}"
+                           placeholder="e.g. 3rd Edition">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="shelfLocation">Shelf Location</label>
+                    <input id="shelfLocation" type="text" class="form-control" th:field="*{shelfLocation}"
+                           placeholder="e.g. A2-15">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="totalCopies">Total Copies *</label>
+                    <input id="totalCopies" type="number" min="1" class="form-control" th:field="*{totalCopies}"
+                           th:classappend="${#fields.hasErrors('totalCopies')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:errors="*{totalCopies}"></div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="coverFile">Upload Cover Image</label>
+                    <input id="coverFile" name="coverFile" type="file" class="form-control"
+                           accept="image/png,image/jpeg,image/webp,image/gif">
+                    <div class="form-text">JPG/PNG/WEBP, max 5 MB. Replaces the URL below if both given.</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="imageUrl">...or Cover Image URL</label>
+                    <input id="imageUrl" type="url" class="form-control" th:field="*{imageUrl}"
+                           placeholder="https://example.com/cover.jpg">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea id="description" rows="3" class="form-control" th:field="*{description}"></textarea>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+                <button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i> Save</button>
+                <a class="btn btn-outline-secondary" th:href="@{/books}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

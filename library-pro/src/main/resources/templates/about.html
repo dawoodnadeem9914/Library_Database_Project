@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:attr="data-bs-theme=${appSettings.themeMode == 'auto' ? 'light' : appSettings.themeMode}">
+<head th:replace="~{fragments/layout :: head('About')}"></head>
+<body>
+<aside th:replace="~{fragments/layout :: sidebar('about')}"></aside>
+
+<main class="main fade-in">
+    <!-- Project header -->
+    <div class="card glass p-4 mb-4 text-center">
+        <div class="mx-auto mb-2" style="width:64px;height:64px;border-radius:18px;display:grid;place-items:center;
+             background:linear-gradient(135deg,#1d4e89,#3f7cc0);color:#fff;font-size:1.8rem">
+            <i class="bi bi-book-half"></i>
+        </div>
+        <h1 class="h3 page-title mb-1" th:text="${appSettings.libraryName}">Library Management System</h1>
+        <p class="text-secondary mb-0" style="max-width:680px;margin:0 auto">
+            An enterprise-level Library Management System developed for
+            <strong>CSC3402 / CCS3402 — Database Application Development</strong>.
+            The system manages the complete borrowing lifecycle — books, members, loans,
+            fines and reporting — on top of an Oracle database using the Spring MVC architecture.
+        </p>
+    </div>
+
+    <!-- Team -->
+    <h2 class="h5 fw-bold mb-3"><i class="bi bi-people me-1"></i> Team Members</h2>
+    <div class="row g-3 mb-4 justify-content-center">
+        <div class="col-md-6 col-xl-4">
+            <div class="card glass p-4 text-center h-100">
+                <img th:src="@{/images/team/dawood.png}" alt="Dawood Nadeem"
+                     class="rounded-circle mx-auto mb-3 object-fit-cover"
+                     style="width:96px;height:96px;object-position:top">
+                <h3 class="h6 fw-bold mb-0">Dawood Nadeem</h3>
+                <p class="small text-secondary mb-2">226920</p>
+                <span class="badge text-bg-secondary mx-auto">Team Leader</span>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card glass p-4 text-center h-100">
+                <img th:src="@{/images/team/fawzia.png}" alt="Fawzia Moradi"
+                     class="rounded-circle mx-auto mb-3 object-fit-cover"
+                     style="width:96px;height:96px;object-position:top">
+                <h3 class="h6 fw-bold mb-0">Fawzia Moradi</h3>
+                <p class="small text-secondary mb-2">226553</p>
+                <span class="badge text-bg-secondary mx-auto">Developer</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology stack -->
+    <h2 class="h5 fw-bold mb-3"><i class="bi bi-stack me-1"></i> Technologies Used</h2>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card glass p-3 text-center h-100">
+                <i class="bi bi-lightning-charge text-success" style="font-size:1.9rem"></i>
+                <div class="fw-semibold small mt-2">Spring Boot 3</div>
+                <div class="small text-secondary">Application framework</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card glass p-3 text-center h-100">
+                <i class="bi bi-database text-danger" style="font-size:1.9rem"></i>
+                <div class="fw-semibold small mt-2">Oracle 21c XE</div>
+                <div class="small text-secondary">DBMS · SQL Developer</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card glass p-3 text-center h-100">
+                <i class="bi bi-diagram-3 text-primary" style="font-size:1.9rem"></i>
+                <div class="fw-semibold small mt-2">Spring Data JPA</div>
+                <div class="small text-secondary">ORM / persistence</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card glass p-3 text-center h-100">
+                <i class="bi bi-filetype-html text-warning" style="font-size:1.9rem"></i>
+                <div class="fw-semibold small mt-2">Thymeleaf</div>
+                <div class="small text-secondary">Server-side views</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card glass p-3 text-center h-100">
+                <i class="bi bi-bootstrap text-purple" style="font-size:1.9rem;color:#7952b3"></i>
+                <div class="fw-semibold small mt-2">Bootstrap 5</div>
+                <div class="small text-secondary">Responsive UI</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card glass p-3 text-center h-100">
+                <i class="bi bi-shield-check text-info" style="font-size:1.9rem"></i>
+                <div class="fw-semibold small mt-2">Spring Security</div>
+                <div class="small text-secondary">Authentication</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture -->
+    <h2 class="h5 fw-bold mb-3"><i class="bi bi-layers me-1"></i> MVC Architecture</h2>
+    <div class="card glass p-4">
+        <div class="row g-3 text-center">
+            <div class="col-md-4">
+                <div class="p-3 rounded-3" style="background:rgba(63,124,192,.12)">
+                    <i class="bi bi-window text-primary" style="font-size:1.6rem"></i>
+                    <h3 class="h6 fw-bold mt-2">View</h3>
+                    <p class="small text-secondary mb-0">Thymeleaf templates + Bootstrap 5 render the UI
+                        and submit forms to controllers.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded-3" style="background:rgba(244,162,89,.12)">
+                    <i class="bi bi-cpu text-warning" style="font-size:1.6rem"></i>
+                    <h3 class="h6 fw-bold mt-2">Controller + Service</h3>
+                    <p class="small text-secondary mb-0">Controllers map URLs; services enforce business
+                        rules such as loan limits and availability updates.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded-3" style="background:rgba(63,174,114,.12)">
+                    <i class="bi bi-database-check text-success" style="font-size:1.6rem"></i>
+                    <h3 class="h6 fw-bold mt-2">Model</h3>
+                    <p class="small text-secondary mb-0">JPA entities map to the five Oracle tables;
+                        repositories handle all SQL via Spring Data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

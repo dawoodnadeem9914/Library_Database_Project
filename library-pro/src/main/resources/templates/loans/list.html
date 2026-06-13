@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:attr="data-bs-theme=${appSettings.themeMode == 'auto' ? 'light' : appSettings.themeMode}">
+<head th:replace="~{fragments/layout :: head('Loans')}"></head>
+<body>
+<aside th:replace="~{fragments/layout :: sidebar('loans')}"></aside>
+
+<main class="main fade-in">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h1 class="h3 page-title mb-0">Loans</h1>
+            <span class="text-secondary small" th:text="${loans.totalElements} + ' loan records'"></span>
+        </div>
+        <a class="btn btn-primary" th:href="@{/loans/new}"><i class="bi bi-plus-lg me-1"></i> Borrow Book</a>
+    </div>
+
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <div class="card glass mb-3 p-3">
+        <form class="row g-2" th:action="@{/loans}" method="get">
+            <div class="col-md-6 col-lg-5">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input class="form-control" type="text" name="keyword" th:value="${keyword}"
+                           placeholder="Search by member name or book title...">
+                </div>
+            </div>
+            <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Search</button></div>
+            <div class="col-auto" th:if="${keyword}"><a class="btn btn-outline-secondary" th:href="@{/loans}">Clear</a></div>
+        </form>
+    </div>
+
+    <div class="card glass">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                <tr><th>ID</th><th>Member</th><th>Book</th><th>Loan Date</th><th>Due Date</th>
+                    <th>Returned</th><th>Status</th><th class="text-end">Actions</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="loan : ${loans.content}">
+                    <td th:text="${loan.id}"></td>
+                    <td th:text="${loan.member.fullName}"></td>
+                    <td th:text="${loan.book.title}"></td>
+                    <td th:text="${loan.loanDate}"></td>
+                    <td>
+                        <span th:text="${loan.dueDate}"></span>
+                        <div class="small text-danger" th:if="${loan.daysOverdue > 0}"
+                             th:text="${loan.daysOverdue} + ' days overdue'"></div>
+                    </td>
+                    <td th:text="${loan.returnDate} ?: '-'"></td>
+                    <td>
+                        <span class="badge text-bg-warning" th:if="${loan.status=='BORROWED'}">BORROWED</span>
+                        <span class="badge text-bg-success" th:if="${loan.status=='RETURNED'}">RETURNED</span>
+                        <span class="badge text-bg-danger"  th:if="${loan.status=='OVERDUE'}">OVERDUE</span>
+                    </td>
+                    <td class="text-end">
+                        <form class="d-inline" th:if="${loan.status != 'RETURNED'}"
+                              th:action="@{/loans/{id}/return(id=${loan.id})}" method="post">
+                            <button class="btn btn-sm btn-success" title="Return book">
+                                <i class="bi bi-box-arrow-in-down"></i> Return</button>
+                        </form>
+                        <a class="btn btn-sm btn-outline-warning" sec:authorize="hasRole('ADMIN')"
+                           th:href="@{/loans/{id}/edit(id=${loan.id})}"
+                           title="Edit loan dates (admin only)"><i class="bi bi-pencil"></i></a>
+                        <button class="btn btn-sm btn-outline-danger" title="Delete (admin only)"
+                                sec:authorize="hasRole('ADMIN')"
+                                data-bs-toggle="modal" th:attr="data-bs-target='#del-' + ${loan.id}">
+                            <i class="bi bi-trash"></i></button>
+
+                        <div class="modal fade" th:id="'del-' + ${loan.id}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirm Delete</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body text-start">Delete this loan record?</div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form th:action="@{/loans/{id}/delete(id=${loan.id})}" method="post">
+                                            <button class="btn btn-danger" type="submit">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${loans.totalElements == 0}">
+                    <td colspan="8" class="text-center text-secondary py-4">No loans found.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav th:replace="~{fragments/layout :: pagination(${loans}, '/loans', ${keyword})}"></nav>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

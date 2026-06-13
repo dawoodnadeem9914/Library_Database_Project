@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:attr="data-bs-theme=${appSettings.themeMode == 'auto' ? 'light' : appSettings.themeMode}">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<aside th:replace="~{fragments/layout :: sidebar('users')}"></aside>
+
+<main class="main fade-in">
+    <h1 class="h3 page-title mb-1" th:text="${pageTitle}">User Form</h1>
+    <p class="text-secondary small mb-4">Usernames and emails must be unique</p>
+
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+
+    <div class="card glass p-4" style="max-width: 760px">
+        <form th:action="@{${formAction}}" th:object="${form}" method="post" novalidate>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="fullName">Full Name *</label>
+                    <input id="fullName" type="text" class="form-control" th:field="*{fullName}"
+                           th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="username">Username *</label>
+                    <input id="username" type="text" class="form-control" th:field="*{username}"
+                           th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:errors="*{username}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="email">Email *</label>
+                    <input id="email" type="email" class="form-control" th:field="*{email}"
+                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:errors="*{email}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="role">Role *</label>
+                    <select id="role" class="form-select" th:field="*{role}"
+                            th:classappend="${#fields.hasErrors('role')} ? 'is-invalid'">
+                        <option value="">-- select role --</option>
+                        <option value="ADMIN">Administrator</option>
+                        <option value="LIBRARIAN">Librarian</option>
+                        <option value="STAFF">Staff</option>
+                        <option value="MEMBER">Member</option>
+                    </select>
+                    <div class="invalid-feedback" th:errors="*{role}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="password"
+                           th:text="${form.id == null} ? 'Password * (min 8 characters)' : 'New Password (leave blank to keep current)'">Password</label>
+                    <input id="password" type="text" class="form-control" th:field="*{password}">
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               id="active" th:field="*{active}">
+                        <label class="form-check-label" for="active">Account active</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+                <button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i> Save</button>
+                <a class="btn btn-outline-secondary" th:href="@{/users}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
