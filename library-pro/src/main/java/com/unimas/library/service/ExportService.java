@@ -128,7 +128,14 @@ public class ExportService {
                 row.createCell(7).setCellValue(b.getTotalCopies());
                 r++;
             }
-            for (int c = 0; c < HEADERS.length; c++) sheet.autoSizeColumn(c);
+            sheet.setColumnWidth(0, 3000);
+            sheet.setColumnWidth(1, 9000);
+            sheet.setColumnWidth(2, 7000);
+            sheet.setColumnWidth(3, 5000);
+            sheet.setColumnWidth(4, 5000);
+            sheet.setColumnWidth(5, 3000);
+            sheet.setColumnWidth(6, 3000);
+            sheet.setColumnWidth(7, 3000);
             wb.write(out);
             return out.toByteArray();
         } catch (IOException e) {
