@@ -22,7 +22,7 @@ public class FileStorageService {
 
     private static final Set<String> ALLOWED =
             Set.of("image/jpeg", "image/png", "image/webp", "image/gif");
-    private static final long MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+    private static final long MAX_BYTES = 2 * 1024 * 1024; // 2 MB
 
     private final Path root;
 
@@ -34,7 +34,7 @@ public class FileStorageService {
     public String store(MultipartFile file, String subdir) {
         if (file == null || file.isEmpty()) return null;
         if (file.getSize() > MAX_BYTES) {
-            throw new IllegalStateException("Image is too large (max 5 MB).");
+            throw new IllegalStateException("Image is too large (max 2 MB).");
         }
         if (!ALLOWED.contains(file.getContentType())) {
             throw new IllegalStateException("Only JPG, PNG, WEBP or GIF images are allowed.");
