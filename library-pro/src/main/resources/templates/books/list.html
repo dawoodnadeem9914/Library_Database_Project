@@ -103,7 +103,7 @@
                            title="Edit"><i class="bi bi-pencil"></i></a>
                         <form class="d-inline" sec:authorize="hasRole('ADMIN')"
                               th:action="@{/books/{id}/delete(id=${book.id})}" method="post"
-                              th:onsubmit="|return confirm('Delete ' + ${book.title} + '?');|">
+                              onsubmit="return confirm('Delete this book?');">
                             <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete">
                                 <i class="bi bi-trash"></i></button>
                         </form>
