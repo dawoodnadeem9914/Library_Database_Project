@@ -142,26 +142,86 @@ Designed using relational modelling principles and normalised to **Third Normal 
 
 ### Core Tables
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        CORE RELATED TABLES                           │
-│                                                                      │
-│  BOOKS                    LOANS                  MEMBERS            │
-│  ─────────────────        ─────────────────       ─────────────────  │
-│  PK  BOOK_ID              PK  LOAN_ID             PK  MEMBER_ID     │
-│      TITLE                FK  BOOK_ID ────────►       FULL_NAME     │
-│      AUTHOR               FK  MEMBER_ID ──────►   UQ  EMAIL        │
-│  UQ  ISBN                     LOAN_DATE               PHONE         │
-│      CATEGORY                 DUE_DATE            UQ  MATRIC_NO     │
-│      PUBLISHER                RETURN_DATE             MEMBER_TYPE   │
-│      PUBLICATION_YEAR         STATUS                  PHOTO_URL     │
-│      TOTAL_COPIES             [BORROWED /             CREATED_AT    │
-│      AVAILABLE_COPIES          RETURNED /                           │
-│      IMAGE_URL                 OVERDUE]                             │
-│      CREATED_AT/BY                                                  │
-│                                                                      │
-│  Relationship: BOOKS 1──N LOANS N──1 MEMBERS                        │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+erDiagram
+    BOOKS {
+        number BOOK_ID PK
+        varchar TITLE
+        varchar AUTHOR
+        varchar ISBN UK
+        varchar CATEGORY
+        varchar PUBLISHER
+        number  PUBLICATION_YEAR
+        number  TOTAL_COPIES
+        number  AVAILABLE_COPIES
+        varchar IMAGE_URL
+        timestamp CREATED_AT
+    }
+
+    MEMBERS {
+        number  MEMBER_ID PK
+        varchar FULL_NAME
+        varchar EMAIL UK
+        varchar PHONE
+        varchar MATRIC_NO UK
+        varchar MEMBER_TYPE
+        varchar PHOTO_URL
+        timestamp CREATED_AT
+    }
+
+    LOANS {
+        number  LOAN_ID PK
+        number  BOOK_ID FK
+        number  MEMBER_ID FK
+        date    LOAN_DATE
+        date    DUE_DATE
+        date    RETURN_DATE
+        varchar STATUS
+    }
+
+    USERS {
+        number  USER_ID PK
+        varchar FULL_NAME
+        varchar USERNAME UK
+        varchar PASSWORD
+        varchar EMAIL
+        varchar ROLE
+        boolean ACTIVE
+        number  FAILED_ATTEMPTS
+        timestamp LOCK_TIME
+        timestamp LAST_LOGIN
+    }
+
+    SETTINGS {
+        number  SETTING_ID PK
+        varchar LIBRARY_NAME
+        varchar ADMIN_NAME
+        varchar ADMIN_EMAIL
+        number  MAX_LOAN_DAYS
+        number  MAX_BOOKS_PER_MEMBER
+        number  FINE_PER_DAY
+        varchar THEME_MODE
+    }
+
+    AUDIT_LOGS {
+        number  AUDIT_ID PK
+        varchar USERNAME
+        varchar ACTION
+        varchar ENTITY_TYPE
+        varchar DETAILS
+        timestamp CREATED_AT
+    }
+
+    PASSWORD_OTPS {
+        number  OTP_ID PK
+        varchar EMAIL
+        varchar CODE
+        timestamp EXPIRES_AT
+        boolean USED
+    }
+
+    BOOKS    ||--o{ LOANS : "1 book → many loans"
+    MEMBERS  ||--o{ LOANS : "1 member → many loans"
 ```
 
 ### Supporting Tables (No Foreign Keys)
@@ -199,53 +259,81 @@ STATUS         VARCHAR2(15)    CHECK IN (BORROWED, RETURNED, OVERDUE)
 
 ## 🏗️ MVC Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│   VIEW  —  Thymeleaf templates + Bootstrap 5                        │
-│   list.html · form.html · dashboard.html · reports.html            │
-└────────────────────────┬────────────────────────────────────────────┘
-                         │ HTTP Request / Model + View response
-┌────────────────────────▼────────────────────────────────────────────┐
-│   CONTROLLER  —  @Controller (handles HTTP requests)                │
-│   BookController  MemberController  LoanController  UserController  │
-└────────────────────────┬────────────────────────────────────────────┘
-                         │ Business logic calls
-┌────────────────────────▼────────────────────────────────────────────┐
-│   SERVICE  —  @Service (business logic + @Transactional)            │
-│   BookService  MemberService  LoanService  AuditService             │
-│   LoanService: borrow/return logic, copy count, due date calc       │
-└────────────────────────┬────────────────────────────────────────────┘
-                         │ Data access
-┌────────────────────────▼────────────────────────────────────────────┐
-│   REPOSITORY  —  Spring Data JPA (@Repository)                      │
-│   BookRepository  MemberRepository  LoanRepository  UserRepository  │
-└────────────────────────┬────────────────────────────────────────────┘
-                         │ JPA / JDBC
-┌────────────────────────▼────────────────────────────────────────────┐
-│   MODEL  —  Oracle 21c Database                                     │
-│   @Entity: Book · Member · Loan · User  (7 tables + sequences)     │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    V["🖥️ VIEW — Thymeleaf + Bootstrap 5
+    ─────────────────────────────────
+    list.html · form.html
+    dashboard.html · reports.html"]
 
-Cross-cutting: Spring Security (BCrypt, roles, lockout) · AuditService · NotificationJob
+    C["⚙️ CONTROLLER — @Controller
+    ──────────────────────────────────────────
+    BookController · MemberController
+    LoanController · UserController"]
+
+    S["🔧 SERVICE — @Service + @Transactional
+    ──────────────────────────────────────────
+    BookService · MemberService
+    LoanService · AuditService
+    (borrow/return logic · due date · copy count)"]
+
+    R["🗂️ REPOSITORY — Spring Data JPA
+    ──────────────────────────────────────────
+    BookRepository · MemberRepository
+    LoanRepository · UserRepository"]
+
+    DB["🗄️ MODEL — Oracle 21c Database
+    ──────────────────────────────────────────
+    @Entity: Book · Member · Loan · User
+    7 tables + sequences"]
+
+    SEC["🔐 Spring Security
+    BCrypt · Roles · Lockout"]
+
+    AUDIT["📋 AuditService
+    Logs every action"]
+
+    V -->|"HTTP Request"| C
+    C -->|"Returns Model + View"| V
+    C --> S
+    S --> R
+    R -->|"JPA / JDBC"| DB
+    SEC -.->|"Cross-cutting"| C
+    AUDIT -.->|"Cross-cutting"| S
+
+    style V    fill:#1a1b27,stroke:#7952B3,color:#e2e8f0
+    style C    fill:#1a1b27,stroke:#6DB33F,color:#e2e8f0
+    style S    fill:#1a1b27,stroke:#6DB33F,color:#e2e8f0
+    style R    fill:#1a1b27,stroke:#6DB33F,color:#e2e8f0
+    style DB   fill:#1a1b27,stroke:#F80000,color:#e2e8f0
+    style SEC  fill:#1a1b27,stroke:#6DB33F,color:#e2e8f0
+    style AUDIT fill:#1a1b27,stroke:#F7DF1E,color:#e2e8f0
 ```
 
 **Request Flow Example — Borrowing a Book:**
 
 ```
-1. Librarian submits the Borrow form (View)
-   ↓
-2. LoanController receives POST /loans/borrow
-   ↓
-3. LoanService applies business rules:
-   - Checks member active loan count vs MAX_BOOKS_PER_MEMBER (SETTINGS)
-   - Calculates due date = loan_date + MAX_LOAN_DAYS (SETTINGS)
-   - Decrements AVAILABLE_COPIES on the BOOKS row
-   All inside one @Transactional boundary
-   ↓
-4. LoanRepository saves new LOANS record
-   BookRepository saves updated AVAILABLE_COPIES
-   ↓
-5. Controller redirects to /loans → Loans list page (View)
+```mermaid
+sequenceDiagram
+    actor L as Librarian
+    participant V as View (Thymeleaf)
+    participant C as LoanController
+    participant S as LoanService
+    participant DB as Oracle 21c
+
+    L->>V: Submit borrow form (member + book + date)
+    V->>C: POST /loans/borrow
+    C->>S: borrowBook(memberId, bookId, loanDate)
+    S->>DB: Check member active loans vs MAX_BOOKS_PER_MEMBER
+    S->>DB: Read MAX_LOAN_DAYS from SETTINGS
+    Note over S: Calculate due_date = loan_date + MAX_LOAN_DAYS
+    S->>DB: INSERT into LOANS (status = BORROWED)
+    S->>DB: UPDATE BOOKS SET available_copies = available_copies - 1
+    Note over S,DB: All inside one @Transactional boundary
+    S-->>C: Loan created successfully
+    C-->>V: Redirect to /loans
+    V-->>L: Loans list — new loan visible
+```
 ```
 
 ---
