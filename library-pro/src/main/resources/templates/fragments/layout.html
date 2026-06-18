@@ -140,6 +140,21 @@
     }, 5000);
 });
 
+// ---- Delete-modal safety net (works even if Bootstrap JS is slow) ----
+        function killModals() {
+            document.querySelectorAll('.modal.show').forEach(m => {
+                m.classList.remove('show'); m.style.display = 'none';
+            });
+            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        }
+        document.addEventListener('click', e => {
+            if (e.target.matches('[data-bs-dismiss="modal"], .modal')) killModals();
+        });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') killModals(); });
+
         // ---- Loading indicator on form submit / nav clicks ----
         const loader = document.getElementById('page-loader');
         // Only show loader for forms that navigate away (NOT inside modals)
